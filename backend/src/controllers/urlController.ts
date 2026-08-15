@@ -12,6 +12,16 @@ const isValidUrl = (value: string): boolean => {
   }
 };
 
+// Custom codes become part of a URL path, so only allow safe, compact slugs -
+// no spaces, no punctuation that needs percent-encoding.
+const CUSTOM_CODE_PATTERN = /^[a-zA-Z0-9_-]+$/;
+const CUSTOM_CODE_MAX_LENGTH = 30;
+
+const isValidCustomCode = (value: string): boolean =>
+  value.length > 0 &&
+  value.length <= CUSTOM_CODE_MAX_LENGTH &&
+  CUSTOM_CODE_PATTERN.test(value);
+
 // POST /api/urls - create a short url
 export async function createUrl(req: Request, res: Response) {
   const { originalUrl, customCode } = req.body as {
@@ -26,6 +36,12 @@ export async function createUrl(req: Request, res: Response) {
   let code = customCode?.trim();
 
   if (code) {
+    if (!isValidCustomCode(code)) {
+      return res.status(400).json({
+        error:
+          "custom code hanya boleh huruf, angka, tanda hubung (-), atau underscore (_), tanpa spasi, maksimal 30 karakter",
+      });
+    }
     const exists = await prisma.url.findUnique({ where: { code } });
     if (exists) {
       return res.status(409).json({ error: "custom code sudah dipakai" });

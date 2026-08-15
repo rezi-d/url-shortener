@@ -40,9 +40,12 @@ export function CreateForm({ onCreated }: Props) {
         />
         <input
           type="text"
-          placeholder="custom code (opsional)"
+          placeholder="custom code (opsional), cth: absen2"
           value={customCode}
           onChange={(e) => setCustomCode(e.target.value)}
+          pattern="[a-zA-Z0-9_-]+"
+          maxLength={30}
+          title="Hanya huruf, angka, tanda hubung (-), atau underscore (_) - tanpa spasi"
           style={{ flex: 1, minWidth: 160, padding: 8 }}
         />
         <button type="submit" disabled={loading} style={{ padding: "8px 16px" }}>
